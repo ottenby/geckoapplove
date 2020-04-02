@@ -5,6 +5,8 @@ const verifyToken = require('./verifyToken');
 const {
     User
 } = require("../model/userModel");
+
+
 router.get('/myaccount', verifyToken, async (req, res)=> {
 
     const user = await User.findOne({
@@ -64,6 +66,7 @@ router.get("/deleteCart/:index", verifyToken, async (req, res) => {
     res.redirect('/checkout');
 
 });
+
 
 
 module.exports = router;

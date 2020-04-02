@@ -4,6 +4,7 @@ const verifyToken = require('./verifyToken');
 const {
     User
 } = require("../model/userModel");
+const stripe = require("stripe")("sk_test_2ujXPEZN2WsYlrW8cEGeZO3s001R5eWX3g")
 
 const router = express.Router();
 
@@ -21,9 +22,28 @@ router.get("/checkout", verifyToken, async (req, res) => {
     }
     user.totalCartPrice = totalPrice;
     await user.save()
-    res.render('checkout', {user});
+    // const user = await User.findOne({_id: req.user.user._id}).populate("cart.productId")
+    if (user.cart.length > 0) {
+    return stripe.checkout.sessions.create({
+        payment_method_types: ["card"],
+        line_items: user.cart.map((product)=> {
+            return {
+                name: product.productId.title,
+                amount: product.productId.price*100,
+                quantity: product.amount,
+                currency: "sek"
+            }
+        }),
+        success_url:"http://localhost:4000/products",
+        cancel_url:"http://localhost:4000/"
+    }).then(  (session)=>  {
+        console.log('sessionID: '+session.id)
+        res.render('checkout', {user, sessionId:session.id});
+    })
     
-    
+} else {
+    res.render("checkout", {user, sessionId:undefined});
+}
 });
 
 module.exports = router;

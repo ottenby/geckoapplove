@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include ("partial/header.ejs") %>
+
+<body>
+
+    <%- include ("partial/navbar") %>
+    <%- include ("partial/tothetop") %>
+
+
+<form action="" method="post">
+
+<% user.cart.forEach( (product) => { %>
+   <div> <%= product.productId.title %> </div>
+   <div> <%= product.productId.price %> </div>
+<% )} %>
+<button id="payBtn" type="submit">Buy</button>
+
+</form>
+
+<script src="https://js.stripe.com/v3/"></script>
+<script>
+    var stripe = Stripe("pk_test_pPuTM9tO8jxhSfWuuauDnPkj00Z2VD68Oo");
+    document.querySelector("#payBtn").addEventListener("click", ()=> {
+        stripe.redirectToCheckout({
+            sessionId: "<%=sessionId%>"
+        })
+    })
+</script>
+<%- include ("partial/footer.ejs") %>
+</body>
+</html>
